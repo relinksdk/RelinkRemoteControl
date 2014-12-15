@@ -11,6 +11,8 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.relinkdevice.rrc.R;
+import com.relinkdevice.rrc.util.Constants;
+import com.relinkdevice.rrc.util.PreferenceUtil;
 
 import java.io.IOException;
 
@@ -26,11 +28,15 @@ public class MainActivity extends ActionBarActivity {
 
     private String mRegistrationID;
 
+    private PreferenceUtil mPreference;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initViews();
+
+        mPreference = PreferenceUtil.getInstance(this);
     }
 
     /**
@@ -62,6 +68,8 @@ public class MainActivity extends ActionBarActivity {
                     mGCM = GoogleCloudMessaging.getInstance(getApplicationContext());
                 }
                 mRegistrationID = mGCM.register(PROJECT_NUMBER);
+
+                saveRegistrationId(mRegistrationID);
                 msg = "Device registered, registration ID=" + mRegistrationID;
                 Log.i("GCM", msg);
             } catch (IOException ex) {
@@ -69,6 +77,13 @@ public class MainActivity extends ActionBarActivity {
 
             }
             return msg;
+        }
+
+        /**
+         * Save registration id to preference
+         * */
+        private void saveRegistrationId(String registrationId) {
+            mPreference.setString(Constants.KEY_DEVICE_REGISTRATION_ID, registrationId);
         }
 
         @Override
