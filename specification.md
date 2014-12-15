@@ -29,8 +29,22 @@ The communication should be:
 
   *1-to-many*: From a single device, we should be able to send some messages to many remote ones. A use case would be a nursing home which would send a "Time to eat" message to all its residents.
 
-Architecture
+Security
 ------------
+
+GCM registration ID should not be used directly. The local device will use a custom registration ID created from it registration ID, the remote device registration ID hashed with a salt. This way, another device knowing the custom registration ID won't be able to communicate with the remote device as the GCM server will notice the local registration ID doesn't match.
+
+
+Binding
+-------
+
+A local device should be binded to a remote device to be able to send messages. The 1st binding should be done while the 2 devices is close physically (when you set the remote device up). We can imagine to use the bluetooth as a communication between both devices.
+
+When connected, the local device is prompted to provide a 4 digits PIN code. The PIN code is available in the remote device app. This way, someone being near the device which could not manipulate it won't be able to bind the device.
+If the PIN code is right, the device get binded and the custom registration code is sent to the GCM server (using HTTPS) and stored on the local device.
+
+
+
 
 
 
