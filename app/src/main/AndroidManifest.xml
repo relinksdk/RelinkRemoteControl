@@ -32,11 +32,11 @@
             android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-                <action android:name="com.relinkdevice.rrc.REMOTE_INTENT" />
                 <category android:name="com.relinkdevice.rrc" />
             </intent-filter>
         </receiver>
         <service android:name=".service.GcmMessageHandler" />
+
     </application>
 
 </manifest>

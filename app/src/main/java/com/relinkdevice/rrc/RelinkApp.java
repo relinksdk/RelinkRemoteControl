@@ -2,21 +2,19 @@ package com.relinkdevice.rrc;
 
 import android.app.Application;
 
-import com.relinkdevice.rrc.helpers.GetRegistrationId;
+import com.relinkdevice.rrc.helpers.RemoteControl;
 
 /**
  * Created by nakov on 12/15/14.
  */
 public class RelinkApp extends Application {
 
-    private String mRegID;
+    private static String mRegID;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
-        GetRegistrationId regId = new GetRegistrationId(this);
-        mRegID = regId.getRegistrationId();
     }
 
     /**
@@ -24,7 +22,16 @@ public class RelinkApp extends Application {
      *
      * @return
      */
-    public String getRegID() {
+    public static String getRegID() {
         return mRegID;
+    }
+
+    /**
+     * Set GCM registration ID.
+     *
+     * @param regId
+     */
+    public static void setRegID(String regId) {
+        mRegID = regId;
     }
 }
