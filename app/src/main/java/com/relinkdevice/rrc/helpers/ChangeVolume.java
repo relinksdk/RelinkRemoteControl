@@ -14,10 +14,8 @@ import com.relinkdevice.rrc.util.Constants;
 public class ChangeVolume {
 
     private int[] mTypes = {AudioManager.STREAM_SYSTEM, AudioManager.STREAM_MUSIC, AudioManager.STREAM_ALARM, AudioManager.STREAM_RING};
-    private int[] mLevels = {AudioManager.RINGER_MODE_SILENT, AudioManager.RINGER_MODE_VIBRATE};
 
     private Bundle mData;
-
     private AudioManager mAudioManager;
 
     public ChangeVolume(Context ctx, Bundle data) {

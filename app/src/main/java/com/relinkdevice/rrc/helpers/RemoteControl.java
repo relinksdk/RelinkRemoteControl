@@ -130,21 +130,21 @@ public class RemoteControl {
     private void sendRegistrationIdToBackend() {
         Log.d(Constants.TAG, "REGISTER USER ID: " + mRegistrationId);
         String name = "trajche.nakov@gmail.com";
-        new AsyncTask<String, Void, String>() {
+        new AsyncTask<String, Void, Void>() {
             @Override
-            protected String doInBackground(String... params) {
-                String msg = "";
+            protected Void doInBackground(String... params) {
                 try {
                     Bundle data = new Bundle();
                     data.putString("name", params[0]);
                     data.putString("action", Constants.ACTION_REGISTER);
                     String id = Integer.toString(mId.incrementAndGet());
                     mGCM.send(Constants.GCM_SENDER_HOST, id, Constants.GCM_TIME_TO_LIVE, data);
-                    msg = "Sent registration";
+
+                    Log.i(Constants.TAG, "Registration ID sent to backend");
                 } catch (IOException ex) {
-                    msg = "Error :" + ex.getMessage();
+                    Log.d(Constants.TAG, ex.getLocalizedMessage());
                 }
-                return msg;
+                return null;
             }
 
         }.execute(name);
