@@ -8,25 +8,19 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Xml;
-
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.relinkdevice.rrc.RelinkApp;
 import com.relinkdevice.rrc.util.Constants;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlSerializer;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.StringWriter;
-import java.util.Set;
+import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -34,29 +28,40 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class RemoteIntent extends Intent {
 
-    private String mRegistrationId;
-
-    private InputStream is;
+    private static final String KEY_INTENT = "intent";
+    private static final String KEY_ACTION = "action";
+    private static final String KEY_DATA = "data";
+    private static final String KEY_TYPE = "type";
+    private static final String KEY_COMPONENT = "component";
+    private static final String KEY_EXTRAS = "extras";
+    private static final String KEY_FLAGS = "flags";
+    private static final String KEY_CATEGORY = "category";
+    private static final String KEY_CATEGORIES = "categories";
 
     private GoogleCloudMessaging mGoogleCloudMessaging;
 
-    private AtomicInteger mId = new AtomicInteger();
+    private AtomicInteger mId;
 
-    public RemoteIntent(Context ctx, String action) {
-        super(action);
+    public RemoteIntent(Context ctx) {
+        super();
         mGoogleCloudMessaging = GoogleCloudMessaging.getInstance(ctx);
-        mRegistrationId = RelinkApp.getRegID();
+        mId = new AtomicInteger();
     }
 
     /**
      * Converts the original intent data into serialized xml string and sends a GCM message.
      */
     public void sendRemote() {
+        if (mGoogleCloudMessaging == null) {
+            Log.i(Constants.TAG, "Google cloud messaging is not initialized. Please use the RemoteIntent constructor.");
+            return;
+        }
+
         try {
             JSONObject obj = saveToJSON();
 
             Bundle data = new Bundle();
-            data.putString("intent", obj.toString());
+            data.putString(KEY_INTENT, obj.toString());
             send(data);
 
         } catch (JSONException e) {
@@ -74,7 +79,7 @@ public class RemoteIntent extends Intent {
             protected Void doInBackground(Bundle... params) {
                 try {
                     Bundle data = params[0];
-                    data.putString("action", Constants.ACTION_REMOTE_INTENT);
+                    data.putString(KEY_ACTION, Constants.ACTION_REMOTE_INTENT);
                     String id = Integer.toString(mId.incrementAndGet());
                     mGoogleCloudMessaging.send(Constants.GCM_SENDER_HOST, id, Constants.GCM_TIME_TO_LIVE, data);
                 } catch (IOException ex) {
@@ -96,109 +101,99 @@ public class RemoteIntent extends Intent {
     private JSONObject saveToJSON() throws JSONException {
         JSONObject obj = new JSONObject();
         if (getAction() != null) {
-            obj.put("action", getAction());
+            obj.put(KEY_ACTION, getAction());
         }
         if (getData() != null) {
-            obj.put("data", getData().toString());
+            obj.put(KEY_DATA, getData().toString());
         }
         if (getType() != null) {
-            obj.put("type", getType());
+            obj.put(KEY_TYPE, getType());
         }
         if (getComponent() != null) {
-            obj.put("component", getComponent().flattenToShortString());
+            obj.put(KEY_COMPONENT, getComponent().flattenToShortString());
         }
-        obj.put("flags", Integer.toHexString(getFlags()));
+
+        Bundle data = getExtras();
+        if (data != null) {
+            JSONArray extras = new JSONArray();
+            for (String key : data.keySet()) {
+                extras.put(new JSONObject().put(key, data.get(key)));
+            }
+            obj.put(KEY_EXTRAS, extras);
+        }
+        obj.put(KEY_FLAGS, Integer.toHexString(getFlags()));
 
         if (getCategories() != null) {
             JSONArray categories = new JSONArray();
             for (int categoryNdx = getCategories().size() - 1; categoryNdx >= 0; --categoryNdx) {
-                categories.put(new JSONObject().put("category", getCategories().toArray()[categoryNdx].toString()));
+                categories.put(new JSONObject().put(KEY_CATEGORY, getCategories().toArray()[categoryNdx].toString()));
             }
-            obj.put("categories", categories);
+            obj.put(KEY_CATEGORIES, categories);
         }
 
         return obj;
     }
 
-    private void saveToXml() throws IOException {
-        XmlSerializer serializer = Xml.newSerializer();
-        serializer.startDocument(null, true);
-        final StringWriter writer = new StringWriter();
-        serializer.setOutput(writer);
-        serializer.startDocument("UTF-8", true);
+    /**
+     * Create new Intent object from JSON.
+     *
+     * @param data
+     * @return
+     */
+    public static Intent getFromJSON(String data) {
 
-        serializer.startTag(null, "intent");
-        if (getAction() != null) {
-            serializer.attribute(null, "action", getAction());
-        }
-        if (getData() != null) {
-            serializer.attribute(null, "data", getData().toString());
-        }
-        if (getType() != null) {
-            serializer.attribute(null, "type", getType());
-        }
-        if (getComponent() != null) {
-            serializer.attribute(null, "component", getComponent().flattenToShortString());
-        }
-        serializer.attribute(null, "flags", Integer.toHexString(getFlags()));
+        if(data == null)
+            return null;
 
-        if (getCategories() != null) {
-            serializer.startTag(null, "categories");
-            for (int categoryNdx = getCategories().size() - 1; categoryNdx >= 0; --categoryNdx) {
-                serializer.attribute(null, "category", getCategories().toArray()[categoryNdx].toString());
-            }
-            serializer.endTag(null, "categories");
-        }
-        serializer.endTag(null, "intent");
-
-        serializer.endDocument();
-
-        Log.i("AAA", serializer.toString());
-        is = new ByteArrayInputStream(serializer.toString().getBytes());
-
-    }
-
-    private Intent restoreFromXML() throws IOException, XmlPullParserException {
-        XmlPullParser in = Xml.newPullParser();
-        in.setInput(new BufferedReader(new InputStreamReader(is)));
         Intent intent = new Intent();
-        final int outerDepth = in.getDepth();
 
-        int attrCount = in.getAttributeCount();
-        for (int attrNdx = attrCount - 1; attrNdx >= 0; --attrNdx) {
-            final String attrName = in.getAttributeName(attrNdx);
-            final String attrValue = in.getAttributeValue(attrNdx);
-            if ("action".equals(attrName)) {
-                intent.setAction(attrValue);
-            } else if ("data".equals(attrName)) {
-                intent.setData(Uri.parse(attrValue));
-            } else if ("type".equals(attrName)) {
-                intent.setType(attrValue);
-            } else if ("component".equals(attrName)) {
-                intent.setComponent(ComponentName.unflattenFromString(attrValue));
-            } else if ("flags".equals(attrName)) {
-                intent.setFlags(Integer.valueOf(attrValue, 16));
-            } else {
-                Log.e("Intent", "restoreFromXml: unknown attribute=" + attrName);
+        try {
+            JSONObject obj = new JSONObject(data);
+
+            if(obj.has(KEY_ACTION)) {
+                intent.setAction(obj.getString(KEY_ACTION));
             }
-        }
 
-        int event;
-        String name;
-        while (((event = in.next()) != XmlPullParser.END_DOCUMENT) &&
-                (event != XmlPullParser.END_TAG || in.getDepth() < outerDepth)) {
-            if (event == XmlPullParser.START_TAG) {
-                name = in.getName();
-                if ("categories".equals(name)) {
-                    attrCount = in.getAttributeCount();
-                    for (int attrNdx = attrCount - 1; attrNdx >= 0; --attrNdx) {
-                        intent.addCategory(in.getAttributeValue(attrNdx));
+            if(obj.has(KEY_DATA)) {
+                Uri uri = Uri.parse(obj.getString(KEY_DATA));
+                intent.setData(uri);
+            }
+
+            if(obj.has(KEY_TYPE)) {
+                intent.setType(obj.getString(KEY_TYPE));
+            }
+
+            if(obj.has(KEY_COMPONENT)) {
+                intent.setComponent(ComponentName.unflattenFromString(obj.getString(KEY_COMPONENT)));
+            }
+
+            if(obj.has(KEY_EXTRAS)) {
+                JSONArray extras = obj.getJSONArray(KEY_EXTRAS);
+                for(int i = 0; i < extras.length(); i++) {
+                    JSONObject o = extras.getJSONObject(i);
+                    Iterator<String> it = o.keys();
+                    while(it.hasNext()) {
+                        String key = it.next();
+                        intent.putExtra(key, o.get(key).toString());
                     }
-                } else {
-                    Log.w("Intent", "restoreFromXml: unknown name=" + name);
-//                    XmlUtils.skipCurrentTag(in);
                 }
             }
+
+            if(obj.has(KEY_FLAGS)) {
+                intent.setFlags(Integer.valueOf(obj.getString(KEY_FLAGS), 16));
+            }
+
+            if(obj.has(KEY_CATEGORIES)) {
+                JSONArray categories = obj.getJSONArray(KEY_CATEGORIES);
+                for(int i = 0; i < categories.length(); i++) {
+                    JSONObject o = categories.getJSONObject(i);
+                    if(o.has(KEY_CATEGORY))
+                        intent.addCategory(o.getString(KEY_CATEGORY));
+                }
+            }
+
+        } catch (JSONException e) {
+            Log.d(Constants.TAG, e.getLocalizedMessage());
         }
 
         return intent;

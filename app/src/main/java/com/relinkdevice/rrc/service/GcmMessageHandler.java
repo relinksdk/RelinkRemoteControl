@@ -1,13 +1,18 @@
 package com.relinkdevice.rrc.service;
 
 import android.app.IntentService;
+import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.relinkdevice.rrc.helpers.ChangeVolume;
+import com.relinkdevice.rrc.helpers.RemoteIntent;
+import com.relinkdevice.rrc.util.Constants;
 
 /**
  * Created by nakov on 12/14/14.
@@ -26,29 +31,25 @@ public class GcmMessageHandler extends IntentService {
         super.onCreate();
         mHandler = new Handler();
     }
+
     @Override
     protected void onHandleIntent(Intent intent) {
         Bundle extras = intent.getExtras();
 
-        GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
-        // The getMessageType() intent parameter must be the intent you received
-        // in your BroadcastReceiver.
-        String messageType = gcm.getMessageType(intent);
+        if (!extras.isEmpty()) {
+            Intent i = RemoteIntent.getFromJSON(extras.getString("intent"));
+            if(i == null) {
+                Log.i(Constants.TAG, "No intent data passed.");
+            } else {
+                if(Constants.ACTION_CHANGE_VOLUME.equals(i.getAction())) {
+                    ChangeVolume cv = new ChangeVolume(getApplicationContext(), i.getExtras());
+                    cv.changeVolume();
+                }
+            }
 
-        mMsg = extras.getString("title");
-        showToast();
-        Log.i("GCM", "Received : (" + messageType + ")  " + extras.getString("title"));
+        }
 
         GcmBroadcastReceiver.completeWakefulIntent(intent);
-    }
-
-    public void showToast(){
-        mHandler.post(new Runnable() {
-            public void run() {
-                Toast.makeText(getApplicationContext(), mMsg, Toast.LENGTH_LONG).show();
-            }
-        });
-
     }
 
 }

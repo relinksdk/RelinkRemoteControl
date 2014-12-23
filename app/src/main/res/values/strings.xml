@@ -2,8 +2,30 @@
 <resources>
 
     <string name="app_name">RelinkRemoteControl</string>
-    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_main">Relink</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="btn_change_volume">Change volume</string>
+    <string name="lbl_volume_type">Volume type</string>
+    <string name="lbl_volume_level">Volume level</string>
 
+    <string-array name="volume_types">
+        <item>System</item>
+        <item>Media</item>
+        <item>Alarm</item>
+        <item>Ring</item>
+    </string-array>
+
+    <string-array name="volume_levels">
+        <item>Silent</item>
+        <item>Vibrate</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>Max</item>
+    </string-array>
 </resources>

@@ -21,4 +21,6 @@ public class Constants {
 
     public static final String ACTION_REMOTE_INTENT = "com.relinkdevice.gmc.REMOTE_INTENT";
 
+    public static final String ACTION_CHANGE_VOLUME = "com.relinkdevice.gmc.CHANGE_VOLUME";
+
 }
