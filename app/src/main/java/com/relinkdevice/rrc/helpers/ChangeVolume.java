@@ -44,7 +44,7 @@ public class ChangeVolume {
         } else if(level == 1) {
             mAudioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
         } else if(level == 9) { // max
-            mAudioManager.adjustStreamVolume(mTypes[type], mAudioManager.getStreamMaxVolume(mTypes[type]), 0);
+            mAudioManager.setStreamVolume(mTypes[type], mAudioManager.getStreamMaxVolume(mTypes[type]), 0);
         } else {
             if(level > curLevel) {
                 level = level - curLevel;
