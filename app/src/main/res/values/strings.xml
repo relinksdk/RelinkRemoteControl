@@ -8,6 +8,9 @@
     <string name="btn_change_volume">Change volume</string>
     <string name="lbl_volume_type">Volume type</string>
     <string name="lbl_volume_level">Volume level</string>
+    <string name="btn_register">Register</string>
+
+    <string name="error_email_address">The email address is not valid.</string>
 
     <string-array name="volume_types">
         <item>System</item>

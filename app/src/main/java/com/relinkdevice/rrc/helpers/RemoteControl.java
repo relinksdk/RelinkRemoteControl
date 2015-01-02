@@ -27,7 +27,7 @@ public class RemoteControl {
 
     private PreferenceUtil mPreferenceUtil;
 
-    private String mRegistrationId;
+    private static String mRegistrationId;
 
     private GoogleCloudMessaging mGCM;
 
@@ -35,15 +35,20 @@ public class RemoteControl {
 
     private AtomicInteger mId = new AtomicInteger();
 
-    public static void init(Activity activity) {
+    public static RemoteControl init(Activity activity) {
         if (mRemoteControl == null)
             mRemoteControl = new RemoteControl(activity);
+
+        return mRemoteControl;
     }
 
     public RemoteControl(Activity activity) {
         mPreferenceUtil = PreferenceUtil.getInstance(activity);
-
         mRegistrationId = mPreferenceUtil.getString(Constants.KEY_DEVICE_REGISTRATION_ID, null);
+
+        if (mGCM == null) {
+            mGCM = GoogleCloudMessaging.getInstance(activity);
+        }
 
         if (mRegistrationId == null) {
             retrieveRegistrationId(activity);
@@ -97,12 +102,7 @@ public class RemoteControl {
         @Override
         protected Void doInBackground(Void... params) {
             try {
-                if (mGCM == null) {
-                    mGCM = GoogleCloudMessaging.getInstance(mContext);
-                }
                 mRegistrationId = mGCM.register(Constants.PROJECT_NUMBER);
-
-                sendRegistrationIdToBackend();
 
                 saveRegistrationId(mRegistrationId);
                 Log.i(TAG, "RegID: " + mRegistrationId);
@@ -126,10 +126,15 @@ public class RemoteControl {
      * Sends the registration ID to the 3rd party server via an upstream
      * GCM message. Ideally this would be done via HTTP to guarantee success or failure
      * immediately, but it would require an HTTP endpoint.
+     *
+     * @param email
      */
-    private void sendRegistrationIdToBackend() {
+    public void register(String email) {
         Log.d(Constants.TAG, "REGISTER USER ID: " + mRegistrationId);
-        String name = "trajche.nakov@gmail.com";
+
+        // get out if already registered.
+        if (mPreferenceUtil.getBoolean(Constants.KEY_REGISTERED, false)) return;
+
         new AsyncTask<String, Void, Void>() {
             @Override
             protected Void doInBackground(String... params) {
@@ -147,15 +152,23 @@ public class RemoteControl {
                 return null;
             }
 
-        }.execute(name);
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                mPreferenceUtil.setBoolean(Constants.KEY_REGISTERED, true);
+            }
+        }.execute(email);
     }
 
     /**
      * Send an upstream GCM message to the 3rd party server to remove this
      * device's registration ID, and contact the GCM server to do the same.
      */
-    private void unregister() {
+    public void unregister() {
         Log.d(Constants.TAG, "UNREGISTER USER ID: " + mRegistrationId);
+
+        // get out if not registered.
+        if (!mPreferenceUtil.getBoolean(Constants.KEY_REGISTERED, false)) return;
+
         new AsyncTask<Void, Void, String>() {
             @Override
             protected String doInBackground(Void... params) {
@@ -174,6 +187,16 @@ public class RemoteControl {
             }
 
         }.execute();
+    }
+
+    /**
+     * Check if the device is already registered to the back-end.
+     *
+     * @return
+     */
+    public boolean isRegistered() {
+        return mPreferenceUtil != null &&
+                mPreferenceUtil.getBoolean(Constants.KEY_REGISTERED, false);
     }
 
 }

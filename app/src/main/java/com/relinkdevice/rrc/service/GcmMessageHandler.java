@@ -45,6 +45,11 @@ public class GcmMessageHandler extends IntentService {
                     ChangeVolume cv = new ChangeVolume(getApplicationContext(), i.getExtras());
                     cv.changeVolume();
                 }
+
+                if(Intent.ACTION_VIEW.equals(i.getAction())) {
+                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(i);
+                }
             }
 
         }
