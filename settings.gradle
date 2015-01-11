@@ -1,1 +1,1 @@
-include ':app'
+include ':remotecontrol-demo', ':remotecontrol'

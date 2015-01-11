@@ -1,0 +1,137 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/activity_vertical_margin"
+    tools:context=".MainActivity"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/volumeContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/volumeTypeLbl"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/component_height"
+            android:gravity="center_vertical"
+            android:text="@string/lbl_volume_type" />
+
+        <Spinner
+            android:id="@+id/volumeTypes"
+            android:layout_toRightOf="@id/volumeTypeLbl"
+            android:layout_width="match_parent"
+            android:layout_marginLeft="@dimen/component_padding"
+            android:layout_height="@dimen/component_height" />
+
+        <TextView
+            android:id="@+id/volumeLevelLbl"
+            android:layout_below="@id/volumeTypes"
+            android:layout_width="wrap_content"
+            android:gravity="center_vertical"
+            android:layout_marginTop="@dimen/component_padding"
+            android:layout_height="@dimen/component_height"
+            android:text="@string/lbl_volume_level" />
+
+        <Spinner
+            android:id="@+id/volumeLevels"
+            android:layout_below="@id/volumeTypes"
+            android:layout_toRightOf="@id/volumeLevelLbl"
+            android:layout_marginTop="@dimen/component_padding"
+            android:layout_marginLeft="@dimen/component_padding"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/component_height" />
+
+        <Button
+            android:id="@+id/changeVolume"
+            android:layout_below="@id/volumeLevels"
+            android:layout_marginTop="@dimen/component_padding"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_change_volume"
+            android:onClick="changeVolume" />
+
+        <Button
+            android:id="@+id/openInBrowser"
+            android:layout_below="@id/changeVolume"
+            android:layout_marginTop="@dimen/component_padding"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Open Browser"
+            android:onClick="openInBrowser" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/registrationContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible">
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textEmailAddress"
+            android:ems="10"
+            android:id="@+id/email"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+        <Button
+            android:id="@+id/register"
+            android:layout_below="@id/email"
+            android:text="@string/btn_register"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="register" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/btContainer"
+        android:layout_width="match_parent"
+        android:layout_below="@id/volumeContainer"
+        android:layout_height="wrap_content"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/onOff"
+            android:text="@string/enable_bluetooth" />
+
+        <ToggleButton
+            android:id="@+id/onOff"
+            android:layout_alignParentRight="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <ListView
+            android:id="@+id/pairedDevicesList"
+            android:layout_below="@id/onOff"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            </ListView>
+
+        <!--<Button-->
+            <!--android:id="@+id/btnSelectDevice"-->
+            <!--android:layout_below="@id/onOff"-->
+            <!--android:text="@string/btn_select_device"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:visibility="gone"-->
+            <!--android:onClick="scanForDevices"/>-->
+
+        <!--<Button-->
+            <!--android:id="@+id/btnSendViaBT"-->
+            <!--android:layout_below="@id/btnSelectDevice"-->
+            <!--android:text="@string/btn_send_via_bt"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:onClick="sendViaBT"-->
+            <!--android:visibility="gone" />-->
+
+    </RelativeLayout>
+</RelativeLayout>
