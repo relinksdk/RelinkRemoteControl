@@ -115,23 +115,5 @@
             android:layout_height="wrap_content">
             </ListView>
 
-        <!--<Button-->
-            <!--android:id="@+id/btnSelectDevice"-->
-            <!--android:layout_below="@id/onOff"-->
-            <!--android:text="@string/btn_select_device"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:visibility="gone"-->
-            <!--android:onClick="scanForDevices"/>-->
-
-        <!--<Button-->
-            <!--android:id="@+id/btnSendViaBT"-->
-            <!--android:layout_below="@id/btnSelectDevice"-->
-            <!--android:text="@string/btn_send_via_bt"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:onClick="sendViaBT"-->
-            <!--android:visibility="gone" />-->
-
     </RelativeLayout>
 </RelativeLayout>
