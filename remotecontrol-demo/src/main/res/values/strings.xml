@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">RelinkRemoteControl</string>
-    <string name="title_activity_main">Relink</string>
+    <string name="title_activity_main">RelinkRemoteControl</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="btn_change_volume">Change volume</string>
