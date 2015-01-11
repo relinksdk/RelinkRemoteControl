@@ -51,7 +51,7 @@ public class MainActivity extends ActionBarActivity {
 
     private BluetoothAdapter mBluetoothAdapter;
 
-    private BluetoothService mChatService = null;
+    private BluetoothService mBluetoothService = null;
 
     private ArrayAdapter<String> mPairedDevicesArrayAdapter;
 
@@ -154,7 +154,7 @@ public class MainActivity extends ActionBarActivity {
         mOnOffBT = (ToggleButton) findViewById(R.id.onOff);
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        mChatService = new BluetoothService(this, mHandler);
+        mBluetoothService = new BluetoothService(this, mHandler);
 
         if(mBluetoothAdapter != null && mBluetoothAdapter.isEnabled()) {
             mOnOffBT.setChecked(true);
@@ -196,7 +196,7 @@ public class MainActivity extends ActionBarActivity {
             case REQUEST_ENABLE_BT:
                 // When the request to enable Bluetooth returns
                 if (resultCode == Activity.RESULT_OK) {
-                    // Bluetooth is now enabled, so set up a chat session
+                    // Bluetooth is now enabled, so set up a session
                     mOnOffBT.setChecked(true);
                     setPairedDevices();
                 } else {
@@ -263,11 +263,11 @@ public class MainActivity extends ActionBarActivity {
 
         BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
         // Attempt to connect to the device
-        if(mChatService.getState() != BluetoothService.STATE_CONNECTED) {
-            mChatService.connect(device);
+        if(mBluetoothService.getState() != BluetoothService.STATE_CONNECTED) {
+            mBluetoothService.connect(device);
         } else {
             byte[] send = i.getJSON().getBytes();
-            mChatService.write(send);
+            mBluetoothService.write(send);
         }
     }
 
